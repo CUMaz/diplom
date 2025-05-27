@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Анализатор DXF файлов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .upload-form {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+        select, input[type="number"], input[type="file"] {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Вычислить стоимость работ из DXF файлов</h1>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="error">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <form class="upload-form" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="files">DXF файлы:</label>
+            <input type="file" id="files" name="files" multiple accept=".dxf" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="material">Материал:</label>
+            <select id="material" name="material" required>
+                <option value="">-- Выберите материал --</option>
+                {% for material in materials %}
+                    <option value="{{ material }}">{{ material }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="thickness">Толщина (мм):</label>
+            <input type="number" id="thickness" name="thickness" 
+                   min="0.1" max="100" step="0.1" required>
+        </div>
+        
+        <button type="submit">Анализировать</button>
+    </form>
+</body>
+</html>

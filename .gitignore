@@ -1,0 +1,25 @@
+# Папка виртуального окружения
+venv/
+.env/
+
+# Кеш Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Файлы IDE
+.idea/
+.vscode/
+
+# Логи и базы данных
+*.log
+*.sqlite3
+
+# Пользовательские загрузки (но сохраняем пустую папку)
+uploads/*
+!uploads/.gitkeep
+
+# Системные файлы
+.DS_Store (macOS)
+Thumbs.db (Windows)
