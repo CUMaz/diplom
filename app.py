@@ -32,6 +32,10 @@ app.config.update(
     ADMIN_EMAIL='ponomera3d@mail.ru'
 )
 
+# Создаем папку uploads, если её нет
+if not os.path.exists('uploads'):
+    os.makedirs('uploads')
+
 def parse_price_table():
     try:
         wb = openpyxl.load_workbook(app.config['PRICE_FILE'])
