@@ -179,12 +179,33 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Добавьте этот блок после таблицы с результатами -->
+    {% for result in results %}
+        {% if result.cutting_cost == 0 %}
+            <div class="flash-warning">
+                Внимание! Для файла "{{ result.filename }}" рассчитана нулевая стоимость. 
+                Это может указывать на проблему с чертежом. Рекомендуем отправить заявку 
+                для ручной проверки специалистом.
+            </div>
+        {% endif %}
+    {% endfor %}
     
     <div class="summary">
         <h3>Итоговая стоимость:</h3>
         <p>Общая сумма за все файлы: <strong>{{ "%.2f"|format(total_cost) }} руб</strong></p>
     </div>
     
+    <div class="notice" style="margin: 20px 0; padding: 15px; background-color: #fff8e1; border-left: 4px solid #ffc107; color: #333;">
+    <p><strong>Обратите внимание:</strong> Авторасчет еще в стадии тестирования.</p>
+    <p>Если стоимость кажется вам некорректной, вы можете:</p>
+    <ul style="margin: 10px 0; padding-left: 20px;">
+        <li>Оставить заявку на ручной расчет (кнопка "Отправить заявку")</li>
+        <li>Проверить расчет самостоятельно через <a href="{{ url_for('show_price') }}" style="color: #2196F3; text-decoration: underline;">прайс-лист</a></li>
+        
+    </ul>
+</div>
+
     <div class="action-buttons">
         <a href="{{ url_for('show_price') }}" class="btn btn-primary">
     Посмотреть прайс-лист
@@ -206,6 +227,10 @@
                     <label for="phone">Номер телефона:</label>
                     <input type="tel" id="phone" name="phone" required>
                 </div>
+                <div class="form-group">
+                    <label for="comment">Комментарий:</label>
+                    <textarea id="comment" name="comment" rows="3" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+</div>
                 <button type="submit" class="btn-submit">Отправить</button>
             </form>
             <div id="message"></div>
@@ -248,6 +273,7 @@
         const formData = {
             name: form.elements['name'].value.trim(),
             phone: form.elements['phone'].value.trim(),
+            comment: form.elements['comment'].value.trim(), 
             files_info: filesData
         };
 

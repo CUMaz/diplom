@@ -489,7 +489,7 @@ def upload_files():
     price_data = parse_price_table()
     return render_template('index.html', materials=price_data['materials'])
 
-def send_application_email(name, phone, files_info, attachments):
+def send_application_email(name, phone, files_info, attachments, comment=None):
     try:
         msg = MIMEMultipart()
         msg['Subject'] = f'Заявка на резку от {name}'
@@ -500,11 +500,22 @@ def send_application_email(name, phone, files_info, attachments):
         <p><b>Имя:</b> {name}</p>
         <p><b>Телефон:</b> {phone}</p>"""
         
+        if comment:
+            text += f"""<p><b>Комментарий:</b> {comment}</p>"""
+        
         for file in files_info:
             text += f"""<hr>
             <p><b>Файл:</b> {file['filename']}<br>
             <b>Материал:</b> {file['material']}<br>
+            <b>Толщина:</b> {file['thickness']} мм<br>
+            <b>Длина реза:</b> {file['total_length']/1000:.2f} м<br>
+            <b>Точки врезки:</b> {file['cut_points']}<br>
             <b>Стоимость:</b> {file['cutting_cost']} руб.</p>"""
+            
+            # Добавляем предупреждение если стоимость нулевая
+            if float(file['cutting_cost']) == 0:
+                text += """<p style="color: red;"><b>Внимание!</b> Нулевая стоимость может 
+                указывать на проблему с чертежом. Требуется ручная проверка.</p>"""
         
         msg.attach(MIMEText(text, 'html'))
         
@@ -550,10 +561,11 @@ def submit_application():
         data = request.get_json()
         name = data.get('name')
         phone = data.get('phone')
+        comment = data.get('comment', '')  # Добавлено
         files_info = data.get('files_info', [])
         
         if not name or not phone:
-            return jsonify({'success': False, 'message': 'Пожалуйста, заполните все поля'}), 400
+            return jsonify({'success': False, 'message': 'Пожалуйста, заполните все обязательные поля'}), 400
         
         filepaths = []
         for file_info in files_info:
@@ -563,7 +575,7 @@ def submit_application():
                 if os.path.exists(filepath):
                     filepaths.append(filepath)
         
-        success = send_application_email(name, phone, files_info, filepaths)
+        success = send_application_email(name, phone, files_info, filepaths, comment)
         
         if success:
             return jsonify({
@@ -595,4 +607,4 @@ def logout():
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
